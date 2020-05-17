@@ -85,4 +85,36 @@ public class CarController {
         carService.insertCar(car);
         return JSONResult.ok();
     }
+
+    /**
+     * 购买车辆
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("buyCar/{id}")
+    public synchronized JSONResult buyCar(@PathVariable int id) {
+        Car car = carService.findById(id);
+        if(car.getQuantity()==0)
+            return JSONResult.errorMsg("数量为0");
+
+        carService.buyCar(id);
+        return JSONResult.ok();
+    }
+
+    /**
+     * 查询车辆数据，以id排序，返回第from行到第to行之间的车辆
+     * @param carName
+     * @param from
+     * @param to
+     * @return
+     */
+    @GetMapping("findCarsByName/{carName}/{from}/{to}")
+    public JSONResult findCarsByName(@PathVariable String carName, @PathVariable int from, @PathVariable
+                                    int to) {
+        int offset = from<1?1:from - 1;
+        int rows = to - offset;
+        List<Car> cars = carService.findCarsByName(carName, offset, rows);
+        return JSONResult.ok(cars);
+    }
 }
