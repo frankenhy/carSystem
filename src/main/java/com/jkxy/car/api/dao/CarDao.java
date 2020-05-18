@@ -26,8 +26,11 @@ public interface CarDao {
     @Insert("insert into carMessage(carName,carType,price,carSeries,quantity) values(#{carName},#{carType},#{price},#{carSeries},#{quantity})")
     void insertCar(Car car);
 
-    @Update("update carsys.carmessage set quantity = quantity -1 where id=#{id}")
-    void buyCar(int id);
+    @Update("update carMessage set quantity = quantity -1, checkKey=null where id=#{id} and checkKey=#{checkKey}")
+    void buyCar(int id, String checkKey);
+
+    @Update("update carMessage set checkKey=#{checkKey} where id=#{id} and checkKey is null")
+    void lockCar(int id, String checkKey);
 
     @Select("select * from carMessage where carName = #{carName} limit #{offset}, #{rows}")
     List<Car> findCarsByName(String carName, int offset, int rows);

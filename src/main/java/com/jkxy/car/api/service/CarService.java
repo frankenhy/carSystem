@@ -19,7 +19,9 @@ public interface CarService {
 
     void insertCar(Car car);
 
-    void buyCar(int id);
+    void buyCar(int id, String checkKey);
+
+    void lockCar(int id, String checkKey);
 
     List<Car> findCarsByName(String carName, int offset, int rows);
 }

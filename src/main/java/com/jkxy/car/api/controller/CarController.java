@@ -3,9 +3,11 @@ package com.jkxy.car.api.controller;
 import com.jkxy.car.api.pojo.Car;
 import com.jkxy.car.api.service.CarService;
 import com.jkxy.car.api.utils.JSONResult;
+import com.jkxy.car.api.utils.KeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.lang.model.element.NestingKind;
 import java.util.List;
 
 
@@ -87,7 +89,7 @@ public class CarController {
     }
 
     /**
-     * 购买车辆
+     * 购买车辆，购买前先锁定车辆
      *
      * @param id
      * @return
@@ -95,10 +97,14 @@ public class CarController {
     @GetMapping("buyCar/{id}")
     public synchronized JSONResult buyCar(@PathVariable int id) {
         Car car = carService.findById(id);
+        if (car.getCheckKey()!=null)
+            return JSONResult.errorMsg("其他客户正在购买，请稍后重试");
         if(car.getQuantity()==0)
-            return JSONResult.errorMsg("数量为0");
+            return JSONResult.errorMsg("库存为0");
 
-        carService.buyCar(id);
+        String checkKey = KeyUtil.getKey();
+        carService.lockCar(id, checkKey);
+        carService.buyCar(id, checkKey);
         return JSONResult.ok();
     }
 

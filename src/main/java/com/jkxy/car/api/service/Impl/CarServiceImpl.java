@@ -45,8 +45,13 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public void buyCar(int id) {
-        carDao.buyCar(id);
+    public void buyCar(int id, String checkKey) {
+        carDao.buyCar(id, checkKey);
+    }
+
+    @Override
+    public void lockCar(int id, String checkKey) {
+        carDao.lockCar(id, checkKey);
     }
 
     @Override
