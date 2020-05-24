@@ -1,6 +1,7 @@
 package com.jkxy.car.api.controller;
 
 import com.jkxy.car.api.pojo.Car;
+import com.jkxy.car.api.pojo.Inventory;
 import com.jkxy.car.api.service.CarService;
 import com.jkxy.car.api.utils.JSONResult;
 import com.jkxy.car.api.utils.KeyUtil;
@@ -62,7 +63,7 @@ public class CarController {
     @GetMapping("deleteById/{id}")
     public JSONResult deleteById(@PathVariable int id) {
         carService.deleteById(id);
-        return JSONResult.ok();
+        return JSONResult.ok("车辆删除成功");
     }
 
     /**
@@ -73,7 +74,7 @@ public class CarController {
     @PostMapping("updateById")
     public JSONResult updateById(Car car) {
         carService.updateById(car);
-        return JSONResult.ok();
+        return JSONResult.ok("车辆更新成功");
     }
 
     /**
@@ -85,27 +86,29 @@ public class CarController {
     @PostMapping("insertCar")
     public JSONResult insertCar(Car car) {
         carService.insertCar(car);
-        return JSONResult.ok();
+        return JSONResult.ok("车辆添加成功");
     }
 
     /**
      * 购买车辆，购买前先锁定车辆
      *
-     * @param id
+     * @param carList 购车清单，json格式
      * @return
      */
-    @GetMapping("buyCar/{id}")
-    public synchronized JSONResult buyCar(@PathVariable int id) {
-        Car car = carService.findById(id);
-        if (car.getCheckKey()!=null)
-            return JSONResult.errorMsg("其他客户正在购买，请稍后重试");
-        if(car.getQuantity()==0)
-            return JSONResult.errorMsg("库存为0");
+    @PostMapping("buyCar")
+    public synchronized JSONResult buyCar(@RequestBody List<Inventory> carList) {
+        for (Inventory car:carList){
+            Inventory inventory = carService.findCarInventory(car.getId());
+            if (inventory.getCheckKey()!=null)
+                return JSONResult.errorMsg("其他客户正在购买id为"+car.getId()+"的车，请稍后重试");
+            if(inventory.getQuantity() < car.getQuantity())
+                return JSONResult.errorMsg("id为"+car.getId()+"的车库存小于需求");
 
-        String checkKey = KeyUtil.getKey();
-        carService.lockCar(id, checkKey);
-        carService.buyCar(id, checkKey);
-        return JSONResult.ok();
+            car.setCheckKey(KeyUtil.getKey());
+            carService.buyCar(car);
+        }
+
+        return JSONResult.ok("车辆购买成功");
     }
 
     /**
@@ -122,5 +125,21 @@ public class CarController {
         int rows = to - offset;
         List<Car> cars = carService.findCarsByName(carName, offset, rows);
         return JSONResult.ok(cars);
+    }
+
+
+    /**
+     * 编辑车辆库存
+     * @param inventory
+     * @return
+     */
+    @PostMapping("editCarInventory")
+    public JSONResult editCarInventory(Inventory inventory) {
+        Inventory carInv=carService.findCarInventory(inventory.getId());
+        if (carInv==null)
+            carService.insertCarInventory(inventory);
+        else
+            carService.updateCarInventory(inventory);
+        return JSONResult.ok("车辆库存更新成功");
     }
 }

@@ -7,8 +7,6 @@ public class Car {
     private String carType;
     private String price;
     private String carSeries;
-    private int quantity;
-    private String checkKey;
 
     public int getId() {
         return id;
@@ -48,22 +46,6 @@ public class Car {
 
     public void setCarSeries(String carSeries) {
         this.carSeries = carSeries;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public String getCheckKey() {
-        return checkKey;
-    }
-
-    public void setCheckKey(String checkKey) {
-        this.checkKey = checkKey;
     }
 
 

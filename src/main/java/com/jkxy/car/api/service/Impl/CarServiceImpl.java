@@ -1,7 +1,9 @@
 package com.jkxy.car.api.service.Impl;
 
 import com.jkxy.car.api.dao.CarDao;
+import com.jkxy.car.api.dao.InventoryDAO;
 import com.jkxy.car.api.pojo.Car;
+import com.jkxy.car.api.pojo.Inventory;
 import com.jkxy.car.api.service.CarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,8 @@ import java.util.List;
 public class CarServiceImpl implements CarService {
     @Autowired
     private CarDao carDao;
+    @Autowired
+    private InventoryDAO inventoryDAO;
 
     @Override
     public List<Car> findAll() {
@@ -45,13 +49,24 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public void buyCar(int id, String checkKey) {
-        carDao.buyCar(id, checkKey);
+    public void buyCar(Inventory car) {
+        inventoryDAO.lockCar(car);
+        inventoryDAO.buyCar(car);
     }
 
     @Override
-    public void lockCar(int id, String checkKey) {
-        carDao.lockCar(id, checkKey);
+    public Inventory findCarInventory(int id) {
+        return inventoryDAO.findCarInventory(id);
+    }
+
+    @Override
+    public void insertCarInventory(Inventory inventory) {
+        inventoryDAO.insertCarInventory(inventory);
+    }
+
+    @Override
+    public void updateCarInventory(Inventory inventory) {
+        inventoryDAO.updateCarInventory(inventory);
     }
 
     @Override

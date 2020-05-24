@@ -1,6 +1,7 @@
 package com.jkxy.car.api.service;
 
 import com.jkxy.car.api.pojo.Car;
+import com.jkxy.car.api.pojo.Inventory;
 
 import java.util.List;
 
@@ -19,9 +20,13 @@ public interface CarService {
 
     void insertCar(Car car);
 
-    void buyCar(int id, String checkKey);
+    void buyCar(Inventory inventory);
 
-    void lockCar(int id, String checkKey);
+    Inventory findCarInventory(int id);
+
+    void insertCarInventory(Inventory inventory);
+
+    void updateCarInventory(Inventory inventory);
 
     List<Car> findCarsByName(String carName, int offset, int rows);
 }
